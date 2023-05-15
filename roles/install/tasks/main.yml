@@ -1,0 +1,38 @@
+---
+
+- name: Añadir repo docker
+  ansible.builtin.yum_repository:
+    name: Docker
+    description: Docker
+    baseurl: https://download.docker.com/linux/centos/8/x86_64/stable/
+    gpgcheck: no
+
+
+- name: Instalar docker
+  ansible.builtin.yum:
+    name: docker-ce
+    state: present
+    update_cache: true
+  
+
+- name: Instalar docker-compose
+  ansible.builtin.shell:
+    cmd: curl -L https://github.com/docker/compose/releases/download/v2.17.3/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+
+
+- name: Dar permisos de ejecucion a docker-compose
+  ansible.builtin.file:
+    path: /usr/local/bin/docker-compose
+    owner: root
+    group: root
+    mode: '0755'
+    state: file
+
+
+- name: Levantar servicio docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+...
