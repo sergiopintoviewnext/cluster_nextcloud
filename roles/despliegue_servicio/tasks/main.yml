@@ -1,0 +1,47 @@
+---
+
+- name: Despliegue desde el master
+  when: ansible_hostname == "master"
+  block:
+  - name: Instalar pip
+    ansible.builtin.yum:
+      name: python3-pip
+      state: present
+      update_cache: true
+
+
+  - name: Instalar jsondiff y pyyaml
+    ansible.builtin.pip:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - jsondiff
+      - pyyaml
+
+
+  - name: Crear carpeta para guardar elementos
+    ansible.builtin.file:
+      path: /cluster_servicio
+      owner: root
+      group: root
+      mode: '0755'
+      state: directory
+
+
+  - name: Copiar fichero de servicio
+    ansible.builtin.copy:
+      src: docker-compose.yml
+      dest: /cluster_servicio/docker-compose.yml
+      owner: root
+      group: root
+      mode: '0755'
+
+
+  - name: Despligue de los servicios del fichero docker-compose
+    community.docker.docker_stack:
+      state: present
+      name: prueba
+      compose:
+        - /cluster_servicio/docker-compose.yml
+
+...
