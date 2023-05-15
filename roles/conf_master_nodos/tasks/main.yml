@@ -1,0 +1,27 @@
+---
+
+- name: Init de docker swarm en master
+  ansible.builtin.command:
+    cmd: docker swarm init
+  when: ansible_hostname == "master"
+  changed_when: false
+  failed_when: false
+  register: swarm_init  
+
+
+- name: crear variable
+  ansible.builtin.set_fact:
+    token: "{{ swarm_init.stdout_lines[4].split()[-2] }} {{ swarm_init.stdout_lines[4].split()[-1] }}"
+  when: ansible_hostname == "master"
+  ignore_errors: true
+
+
+- name: Unir nodos a cluster
+  ansible.builtin.command:
+    cmd: "docker swarm join --token {{ hostvars['master']['token'] }}"
+  when: '"nodo" in ansible_hostname'
+  changed_when: false
+  failed_when: false
+  register: join
+
+...

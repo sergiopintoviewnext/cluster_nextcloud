@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include conf_master_nodos"
+      include_role:
+        name: "conf_master_nodos"
