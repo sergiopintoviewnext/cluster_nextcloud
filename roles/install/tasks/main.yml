@@ -16,9 +16,10 @@
   
 
 - name: Instalar docker-compose
-  ansible.builtin.shell:
-    cmd: curl -L https://github.com/docker/compose/releases/download/v2.17.3/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-  changed_when: false
+  ansible.builtin.get_url:
+    url: https://github.com/docker/compose/releases/download/v2.17.3/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
 
 
 - name: Dar permisos de ejecucion a docker-compose

@@ -1,0 +1,9 @@
+---
+
+- name: Cleanup
+  hosts: all
+  gather_facts: true
+  tasks:
+  - name: leave
+    ansible.builtin.command:
+      cmd: docker swarm leave --force
