@@ -7,6 +7,8 @@ driver:
 platforms:
   - name: master
     image: registry.access.redhat.com/ubi8/ubi-init
+    networks:
+      - name: "red_cluster"          
     hostname: master
     tmpfs:
       - /run
@@ -20,6 +22,8 @@ platforms:
     pre_build_image: true
   - name: nodo1
     image: registry.access.redhat.com/ubi8/ubi-init
+    networks:
+      - name: "red_cluster"      
     hostname: nodo1
     tmpfs:
       - /run
@@ -33,6 +37,8 @@ platforms:
     pre_build_image: true
   - name: nodo2
     image: registry.access.redhat.com/ubi8/ubi-init
+    networks:
+      - name: "red_cluster"      
     hostname: nodo2
     tmpfs:
       - /run

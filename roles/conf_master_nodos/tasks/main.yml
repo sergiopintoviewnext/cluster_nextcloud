@@ -1,27 +1,30 @@
 ---
 
+- name: Instalar pip
+  ansible.builtin.package:
+    name: python3-pip
+    state: present
+    update_cache: true
+
+
+- name: Instalar modulo docker python
+  ansible.builtin.pip:
+    name: docker
+    state: present
+
+
 - name: Init de docker swarm en master
-  ansible.builtin.command:
-    cmd: docker swarm init
+  community.docker.docker_swarm:
+    state: present
+  register: init_swarm
   when: ansible_hostname == "master"
-  changed_when: false
-  failed_when: false
-  register: swarm_init  
-
-
-- name: crear variable
-  ansible.builtin.set_fact:
-    token: "{{ swarm_init.stdout_lines[4].split()[-2] }} {{ swarm_init.stdout_lines[4].split()[-1] }}"
-  when: ansible_hostname == "master"
-  ignore_errors: true
 
 
 - name: Unir nodos a cluster
-  ansible.builtin.command:
-    cmd: "docker swarm join --token {{ hostvars['master']['token'] }}"
+  community.docker.docker_swarm:
+    state: join
+    join_token: "{{ hostvars['master']['init_swarm']['swarm_facts']['JoinTokens']['Worker'] }}"
+    remote_addrs: "{{  hostvars['master']['ansible_hostname'] }}:2377"
   when: '"nodo" in ansible_hostname'
-  changed_when: false
-  failed_when: false
-  register: join
 
 ...
