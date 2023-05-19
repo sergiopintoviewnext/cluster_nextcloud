@@ -3,8 +3,37 @@
 
 - name: Verify
   hosts: all
-  gather_facts: false
+  gather_facts: true
   tasks:
-  - name: Example assertion
-    ansible.builtin.assert:
-      that: true
+    - name: Init de docker swarm en master
+      community.docker.docker_swarm:
+        state: present
+      register: init_swarm
+      when: ansible_hostname == "master"
+
+
+    - name: Comprobar ejecucion init
+      ansible.builtin.assert:
+        that: not init_swarm.changed
+        success_msg: "Cluster swarm iniciado"
+        fail_msg: "Cluster swarm no se habia iniciado durante el converge"
+      when: ansible_hostname == "master"
+
+
+    - name: Unir nodos a cluster
+      community.docker.docker_swarm:
+        state: join
+        join_token: "{{ hostvars['master']['init_swarm']['swarm_facts']['JoinTokens']['Worker'] }}"
+        remote_addrs: "{{  hostvars['master']['ansible_hostname'] }}:2377"
+      when: '"nodo" in ansible_hostname'
+      register: join_swarm
+
+
+    - name: Comprobar ejecucion join
+      ansible.builtin.assert:
+        that: not join_swarm.changed
+        success_msg: "Join realizado"
+        fail_msg: "No se realizo el Join durante el converge"      
+      when: '"nodo" in ansible_hostname'
+      
+...

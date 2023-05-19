@@ -40,7 +40,7 @@
   - name: Despligue de los servicios del fichero docker-compose
     community.docker.docker_stack:
       state: present
-      name: prueba
+      name: "{{ nombre_cluster }}"
       compose:
         - /cluster_servicio/docker-compose.yml
 
