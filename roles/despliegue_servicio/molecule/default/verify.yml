@@ -3,8 +3,27 @@
 
 - name: Verify
   hosts: all
-  gather_facts: false
+  gather_facts: true
+  vars_files:
+    - main.yml
   tasks:
-  - name: Example assertion
-    ansible.builtin.assert:
-      that: true
+  - name: Verify de servicio cluster
+    when: ansible_hostname == "master"
+    block:
+    - name: Inspect de servicio desplegado
+      community.docker.docker_swarm_service_info:
+        name: "{{ nombre_cluster }}_{{ item }}"
+      register: result
+      with_items:
+        - db
+        - wordpress
+  
+
+    - name: Verificar que existe el servicio
+      ansible.builtin.assert:
+        that: item.exists
+        success_msg: "El servicio {{ item.invocation.module_args.name }} esta funcionando"
+        fail_msg: "El servicio {{ item.invocation.module_args.name }} no esta funcionando"
+      with_items: "{{ result.results }}"
+    
+...
