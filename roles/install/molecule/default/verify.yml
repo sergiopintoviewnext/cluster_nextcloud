@@ -5,6 +5,14 @@
   hosts: all
   gather_facts: false
   tasks:
-  - name: Example assertion
+  - name: Iniciar servicio docker
+    ansible.builtin.service:
+      name: docker
+      state: started
+    register: servicio
+
+  - name: Comprobar estado servicio
     ansible.builtin.assert:
-      that: true
+      that: not servicio.changed
+      success_msg: "Servicio docker corriendo"
+      fail_msg: "Servicio docker no corriendo"
