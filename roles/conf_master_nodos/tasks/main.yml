@@ -20,11 +20,19 @@
   when: ansible_hostname == "master"
 
 
+- name: Permitir conexiones por puerto 2377
+  ansible.posix.firewalld:
+    port: 2377/tcp
+    state: enabled
+    permanent: true
+    immediate: true
+
+
 - name: Unir nodos a cluster
   community.docker.docker_swarm:
     state: join
     join_token: "{{ hostvars['master']['init_swarm']['swarm_facts']['JoinTokens']['Worker'] }}"
-    remote_addrs: "{{  hostvars['master']['ansible_hostname'] }}:2377"
+    remote_addrs: "{{  hostvars['master']['ansible_default_ipv4']['address'] }}:2377"
   when: '"nodo" in ansible_hostname'
 
 ...

@@ -1,0 +1,6 @@
+- hosts: all
+  remote_user: root
+  roles:
+    - role: install
+    - role: conf_master_nodos
+    - role: despliegue_servicio
